@@ -1,2 +1,1 @@
-# ocp-kube-alerts
-Queries kubeapiserver from prometheus
+### Work in progress - Using this as a 'quicksave' as I am moving between environments
