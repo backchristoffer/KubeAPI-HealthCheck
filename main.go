@@ -1,3 +1,8 @@
+/* Using env variables in .env file
+PROM_URL="https://prometheus-k8s-openshift-monitoring.apps.hostname/api/v1/query"
+BEARER_TOKEN="" This is the token from a prometheus service account with the right permissions
+*/
+
 package main
 
 import (
@@ -14,7 +19,6 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// loads env from a .env file
 func loadenv(key string) string {
 	err := godotenv.Load(".env")
 	if err != nil {
@@ -35,6 +39,7 @@ type PrometheusQueryResult struct {
 func main() {
 
 	prometheusURL := loadenv("PROM_URL")
+	token := loadenv("BEARER_TOKEN")
 	query := "up{job=\"apiserver\"}"
 
 	req, err := http.NewRequest("GET", prometheusURL, nil)
@@ -47,7 +52,8 @@ func main() {
 	q.Add("query", query)
 	req.URL.RawQuery = q.Encode()
 
-	// Create an HTTP client with TLS config that skips certificate verification
+	req.Header.Set("Authorization", "Bearer "+token)
+
 	client := &http.Client{
 		Timeout: 10 * time.Second,
 		Transport: &http.Transport{
@@ -62,11 +68,15 @@ func main() {
 	}
 	defer resp.Body.Close()
 
+	fmt.Println("Response Status:", resp.Status)
+
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Println("Error reading response body:", err)
 		return
 	}
+
+	fmt.Println("Response Body:", string(body))
 
 	var result PrometheusQueryResult
 	err = json.Unmarshal(body, &result)
@@ -76,8 +86,7 @@ func main() {
 	}
 
 	if result.Status == "success" && len(result.Data.Result) > 0 {
-		// Check the value of the "up" metric
-		status := result.Data.Result[0].Value[1].(string) // Value[1] is the "up" status
+		status := result.Data.Result[0].Value[1].(string)
 		if status == "1" {
 			fmt.Println("OK")
 		} else {
