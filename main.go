@@ -1,3 +1,8 @@
+/* Using env variables in .env file
+PROM_URL="https://prometheus-k8s-openshift-monitoring.apps.hostname/api/v1/query"
+BEARER_TOKEN="" This is the token from a prometheus service account with the right permissions
+*/
+
 package main
 
 import (
@@ -69,10 +74,14 @@ func main() {
 	}
 	defer resp.Body.Close()
 
+	fmt.Println("Response Status:", resp.Status)
+
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Fatalf("Error reading response body: %v", err)
 	}
+
+	fmt.Println("Response Body:", string(body))
 
 	var result PrometheusQueryResult
 	err = json.Unmarshal(body, &result)
