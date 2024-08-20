@@ -1,0 +1,4 @@
+ocp-kube-alerts
+.env
+go.mod
+go.sum
