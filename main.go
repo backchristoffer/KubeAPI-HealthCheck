@@ -1,8 +1,3 @@
-/* Using env variables in .env file
-PROM_URL="https://prometheus-k8s-openshift-monitoring.apps.hostname/api/v1/query"
-BEARER_TOKEN="" This is the token from a prometheus service account with the right permissions
-*/
-
 package main
 
 import (
@@ -31,15 +26,6 @@ type PrometheusQueryResult struct {
 	Status string `json:"status"`
 	Data   struct {
 		Result []struct {
-			Metric struct {
-				Job       string `json:"job"`
-				Endpoint  string `json:"endpoint"`
-				Instance  string `json:"instance"`
-				Service   string `json:"service"`
-				Apiserver string `json:"apiserver"`
-				Namespace string `json:"namespace"`
-				__Name__  string `json:"__name__"`
-			} `json:"metric"`
 			Value []interface{} `json:"value"`
 		} `json:"result"`
 	} `json:"data"`
@@ -74,14 +60,10 @@ func main() {
 	}
 	defer resp.Body.Close()
 
-	fmt.Println("Response Status:", resp.Status)
-
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Fatalf("Error reading response body: %v", err)
 	}
-
-	fmt.Println("Response Body:", string(body))
 
 	var result PrometheusQueryResult
 	err = json.Unmarshal(body, &result)
