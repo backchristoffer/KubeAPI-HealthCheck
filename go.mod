@@ -1,4 +1,4 @@
-module ocp-kube-alerts
+module kubeapi-health
 
 go 1.21.10
 

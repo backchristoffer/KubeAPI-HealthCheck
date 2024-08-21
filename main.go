@@ -60,7 +60,6 @@ func main() {
 	}
 	defer resp.Body.Close()
 
-	// Check the response status code
 	if resp.StatusCode == http.StatusForbidden {
 		log.Fatalf("Received 403 Forbidden: You do not have the necessary permissions to access this resource.")
 	} else if resp.StatusCode != http.StatusOK {
@@ -80,7 +79,6 @@ func main() {
 		log.Fatalf("Error parsing JSON: %v", err)
 	}
 
-	// Check if kube-apiserver is up
 	if result.Status == "success" && len(result.Data.Result) > 0 {
 		status := result.Data.Result[0].Value[1].(string)
 		if status == "1" {

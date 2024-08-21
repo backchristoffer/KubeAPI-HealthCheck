@@ -1,4 +1,4 @@
-ocp-kube-alerts
+kubeapi-health
 .env
 go.mod
 go.sum
